@@ -15,15 +15,20 @@
 #pragma once
 
 #include <stdio.h>
-#include "esp_err.h"
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-void lcd_start();
-void lcd_test();
-void lcd_drawPixel(int16_t x, int16_t y, uint16_t color);
+typedef void* lcd_handle_t;
+
+lcd_handle_t* lcd_create_obj(uint8_t spi_host, uint8_t init_bus);
+
+// uint16_t lcd_color565(lcd_handle_t* lcd_obj, uint8_t r, uint8_t g, uint8_t b);
+void lcd_drawPixel(lcd_handle_t* lcd_obj, int16_t x, int16_t y, uint16_t color);
+void lcd_fillScreen(lcd_handle_t* obj, uint16_t color);
+
 
 #ifdef __cplusplus
 }
