@@ -85,9 +85,55 @@ void lcd_fillScreen(lcd_handle_t* lcd_obj, uint16_t color)
     ((CEspLcd*)lcd_obj)->fillScreen(color);
 }
 
+void lcd_drawLine(lcd_handle_t* lcd_obj, int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint16_t color)
+{
+    ((CEspLcd*)lcd_obj)->drawLine(x0, y0, x1, y1, color);
+}
 
+void lcd_drawTriangle(lcd_handle_t* lcd_obj, int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color)
+{
+    ((CEspLcd*)lcd_obj)->drawTriangle(x0, y0, x1, y1, x2, y2, color);
+}
 
+void lcd_fillTriangle(lcd_handle_t* lcd_obj, int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color)
+{
+    ((CEspLcd*)lcd_obj)->fillTriangle(x0, y0, x1, y1, x2, y2, color);
+}
 
+void lcd_drawCircle(lcd_handle_t* lcd_obj, int16_t x, int16_t y, int16_t r, uint16_t color)
+{
+    ((CEspLcd*)lcd_obj)->drawCircle(x, y, r, color);
+}
+
+void lcd_fillCircle(lcd_handle_t* lcd_obj, int16_t x, int16_t y, int16_t r, uint16_t color)
+{
+    ((CEspLcd*)lcd_obj)->fillCircle(x, y, r, color);
+}
+
+// void lcd_drawRect(lcd_handle_t* lcd_obj, int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color)
+// {
+//     ((CEspLcd*)lcd_obj)->drawRect(x, y, w, h, color);
+// }
+
+// void lcd_fillRect(lcd_handle_t* lcd_obj, int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color)
+// {
+//     ((CEspLcd*)lcd_obj)->fillRect(x, y, w, h, color);
+// }
+
+// void lcd_drawRoundRect(lcd_handle_t* lcd_obj, int16_t x, int16_t y, int16_t w, int16_t h, int16_t r, uint16_t color)
+// {
+//     ((CEspLcd*)lcd_obj)->drawRoundRect(x, y, w, h, r, color);
+// }
+
+// void lcd_fillRoundRect(lcd_handle_t* lcd_obj, int16_t x, int16_t y, int16_t w, int16_t h, int16_t r, uint16_t color)
+// {
+//     ((CEspLcd*)lcd_obj)->fillRoundRect(x, y, w, h, r, color);
+// }
+
+void lcd_drawString(lcd_handle_t* lcd_obj, const char *string, uint16_t x, uint16_t y)
+{
+    ((CEspLcd*)lcd_obj)->drawString(string, x, y);
+}
 
 } // extern
 
