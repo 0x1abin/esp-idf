@@ -47,6 +47,7 @@ typedef void* lcd_handle_t;
 lcd_handle_t* lcd_create_obj(uint8_t spi_host, uint8_t init_bus);
 
 // uint16_t lcd_color565(lcd_handle_t* lcd_obj, uint8_t r, uint8_t g, uint8_t b);
+void lcd_setRotation(lcd_handle_t* lcd_obj, uint8_t m);
 void lcd_drawPixel(lcd_handle_t* lcd_obj, int16_t x, int16_t y, uint16_t color);
 void lcd_fillScreen(lcd_handle_t* obj, uint16_t color);
 void lcd_drawLine(lcd_handle_t* lcd_obj, int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint16_t color);
@@ -54,6 +55,7 @@ void lcd_drawTriangle(lcd_handle_t* lcd_obj, int16_t x0, int16_t y0, int16_t x1,
 void lcd_fillTriangle(lcd_handle_t* lcd_obj, int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color);
 void lcd_fillCircle(lcd_handle_t* lcd_obj, int16_t x, int16_t y, int16_t r, uint16_t color);
 void lcd_drawCircle(lcd_handle_t* lcd_obj, int16_t x, int16_t y, int16_t r, uint16_t color);
+void lcd_drawString(lcd_handle_t* lcd_obj, const char *string, uint16_t x, uint16_t y);
 
 #ifdef __cplusplus
 }
