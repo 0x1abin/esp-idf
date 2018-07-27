@@ -135,6 +135,21 @@ void lcd_drawString(lcd_handle_t* lcd_obj, const char *string, uint16_t x, uint1
     ((CEspLcd*)lcd_obj)->drawString(string, x, y);
 }
 
+void lcd_setCursor(lcd_handle_t* lcd_obj, int16_t x, int16_t y)
+{
+    ((CEspLcd*)lcd_obj)->setCursor(int16_t x, int16_t y);
+}
+
+int16_t lcd_getCursorX(lcd_handle_t* lcd_obj)
+{
+    return ((CEspLcd*)lcd_obj)->getCursorX();
+}
+
+int16_t lcd_getCursorY(lcd_handle_t* lcd_obj)
+{
+    return ((CEspLcd*)lcd_obj)->getCursorY();
+}
+
 void lcd_setRotation(lcd_handle_t* lcd_obj, uint8_t m)
 {
     ((CEspLcd*)lcd_obj)->setRotation(m);
