@@ -167,6 +167,9 @@ void lcd_setTextbgColor(lcd_handle_t* lcd_obj, uint16_t c, uint16_t b)
     ((CEspLcd*)lcd_obj)->setTextColor(c, b);
 }
 
+
+
+
 } // extern
 
 // color565(uint8_t r, uint8_t g, uint8_t b)
