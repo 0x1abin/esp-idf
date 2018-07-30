@@ -32,8 +32,8 @@
 
 #include "esp_log.h"
 #include "esp_system.h"
-#include "py/mpprint.h"
-#include "extmod/vfs_native.h"
+// #include "py/mpprint.h"
+// #include "extmod/vfs_native.h"
 
 /*SPI Includes*/
 #include "driver/spi_master.h"
@@ -139,7 +139,7 @@ void lcd_drawString(lcd_handle_t* lcd_obj, const char *string, uint16_t x, uint1
 
 void lcd_setCursor(lcd_handle_t* lcd_obj, int16_t x, int16_t y)
 {
-    ((CEspLcd*)lcd_obj)->setCursor(int16_t x, int16_t y);
+    ((CEspLcd*)lcd_obj)->setCursor(x, y);
 }
 
 int16_t lcd_getCursorX(lcd_handle_t* lcd_obj)
@@ -155,6 +155,16 @@ int16_t lcd_getCursorY(lcd_handle_t* lcd_obj)
 void lcd_setRotation(lcd_handle_t* lcd_obj, uint8_t m)
 {
     ((CEspLcd*)lcd_obj)->setRotation(m);
+}
+
+void lcd_setTextColor(lcd_handle_t* lcd_obj, uint16_t c)
+{
+    ((CEspLcd*)lcd_obj)->setTextColor(c);
+}
+
+void lcd_setTextbgColor(lcd_handle_t* lcd_obj, uint16_t c, uint16_t b)
+{
+    ((CEspLcd*)lcd_obj)->setTextColor(c, b);
 }
 
 //====================================================================================
