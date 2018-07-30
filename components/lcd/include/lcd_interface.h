@@ -61,6 +61,10 @@ void lcd_drawCircle(lcd_handle_t* lcd_obj, int16_t x, int16_t y, int16_t r, uint
 void lcd_drawString(lcd_handle_t* lcd_obj, const char *string, uint16_t x, uint16_t y);
 void lcd_setTextColor(lcd_handle_t* lcd_obj, uint16_t c);
 void lcd_setTextbgColor(lcd_handle_t* lcd_obj, uint16_t c, uint16_t b);
+void lcd_drawRect(lcd_handle_t* lcd_obj, int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
+void lcd_fillRect(lcd_handle_t* lcd_obj, int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
+void lcd_drawRoundRect(lcd_handle_t* lcd_obj, int16_t x, int16_t y, int16_t w, int16_t h, int16_t r, uint16_t color);
+void lcd_fillRoundRect(lcd_handle_t* lcd_obj, int16_t x, int16_t y, int16_t w, int16_t h, int16_t r, uint16_t color);
 
 #ifdef __cplusplus
 }
