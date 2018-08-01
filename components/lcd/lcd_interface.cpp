@@ -112,25 +112,25 @@ void lcd_fillCircle(lcd_handle_t* lcd_obj, int16_t x, int16_t y, int16_t r, uint
     ((CEspLcd*)lcd_obj)->fillCircle(x, y, r, color);
 }
 
-// void lcd_drawRect(lcd_handle_t* lcd_obj, int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color)
-// {
-//     ((CEspLcd*)lcd_obj)->drawRect(x, y, w, h, color);
-// }
+void lcd_drawRect(lcd_handle_t* lcd_obj, int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color)
+{
+    ((CEspLcd*)lcd_obj)->drawRect(x, y, w, h, color);
+}
 
-// void lcd_fillRect(lcd_handle_t* lcd_obj, int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color)
-// {
-//     ((CEspLcd*)lcd_obj)->fillRect(x, y, w, h, color);
-// }
+void lcd_fillRect(lcd_handle_t* lcd_obj, int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color)
+{
+    ((CEspLcd*)lcd_obj)->fillRect(x, y, w, h, color);
+}
 
-// void lcd_drawRoundRect(lcd_handle_t* lcd_obj, int16_t x, int16_t y, int16_t w, int16_t h, int16_t r, uint16_t color)
-// {
-//     ((CEspLcd*)lcd_obj)->drawRoundRect(x, y, w, h, r, color);
-// }
+void lcd_drawRoundRect(lcd_handle_t* lcd_obj, int16_t x, int16_t y, int16_t w, int16_t h, int16_t r, uint16_t color)
+{
+    ((CEspLcd*)lcd_obj)->drawRoundRect(x, y, w, h, r, color);
+}
 
-// void lcd_fillRoundRect(lcd_handle_t* lcd_obj, int16_t x, int16_t y, int16_t w, int16_t h, int16_t r, uint16_t color)
-// {
-//     ((CEspLcd*)lcd_obj)->fillRoundRect(x, y, w, h, r, color);
-// }
+void lcd_fillRoundRect(lcd_handle_t* lcd_obj, int16_t x, int16_t y, int16_t w, int16_t h, int16_t r, uint16_t color)
+{
+    ((CEspLcd*)lcd_obj)->fillRoundRect(x, y, w, h, r, color);
+}
 
 void lcd_drawString(lcd_handle_t* lcd_obj, const char *string, uint16_t x, uint16_t y)
 {
@@ -167,8 +167,30 @@ void lcd_setTextbgColor(lcd_handle_t* lcd_obj, uint16_t c, uint16_t b)
     ((CEspLcd*)lcd_obj)->setTextColor(c, b);
 }
 
+void lcd_setTextSize(lcd_handle_t* lcd_obj, uint8_t s)
+{
+    ((CEspLcd*)lcd_obj)->setTextSize(s);
+}
 
+void lcd_drawFastVLine(lcd_handle_t* lcd_obj, int16_t x, int16_t y, int16_t h, uint16_t color)
+{
+    ((CEspLcd*)lcd_obj)->drawFastHLine(x, y, h, color);
+}
 
+void lcd_drawFastHLine(lcd_handle_t* lcd_obj, int16_t x, int16_t y, int16_t w, uint16_t color)
+{
+    ((CEspLcd*)lcd_obj)->drawFastVLine(x, y, w, color);
+}
+
+void lcd_getTextBounds(lcd_handle_t* lcd_obj, char *str, int16_t x, int16_t y, int16_t *x1, int16_t *y1, uint16_t *w, uint16_t *h)
+{
+    ((CEspLcd*)lcd_obj)->getTextBounds(str, x, y, x1, y1, w, h);
+}
+
+void lcd_getTextWrap(lcd_handle_t* lcd_obj, bool w)
+{
+    ((CEspLcd*)lcd_obj)->getTextWrap(w);
+}
 
 } // extern
 
