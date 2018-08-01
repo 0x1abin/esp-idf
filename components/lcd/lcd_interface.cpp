@@ -187,9 +187,9 @@ void lcd_getTextBounds(lcd_handle_t* lcd_obj, char *str, int16_t x, int16_t y, i
     ((CEspLcd*)lcd_obj)->getTextBounds(str, x, y, x1, y1, w, h);
 }
 
-void lcd_getTextWrap(lcd_handle_t* lcd_obj, bool w)
+void lcd_setTextWrap(lcd_handle_t* lcd_obj, bool w)
 {
-    ((CEspLcd*)lcd_obj)->getTextWrap(w);
+    ((CEspLcd*)lcd_obj)->setTextWrap(w);
 }
 
 } // extern
