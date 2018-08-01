@@ -192,6 +192,11 @@ void lcd_setTextWrap(lcd_handle_t* lcd_obj, bool w)
     ((CEspLcd*)lcd_obj)->setTextWrap(w);
 }
 
+void lcd_setBrightness(lcd_handle_t* lcd_obj, uint8_t duty)
+{
+    ((CEspLcd*)lcd_obj)->setBrightness(duty);
+}
+
 } // extern
 
 // color565(uint8_t r, uint8_t g, uint8_t b)

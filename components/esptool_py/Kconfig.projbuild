@@ -2,14 +2,14 @@ menu "Serial flasher config"
 
 config ESPTOOLPY_PORT
 	string "Default serial port"
-	default "/dev/ttyUSB0"
+	default "/dev/tty.SLAB_USBtoUART"
 	help
 		The serial port that's connected to the ESP chip. This can be overridden by setting the ESPPORT
 		environment variable.
 
 choice ESPTOOLPY_BAUD
 	prompt "Default baud rate"
-	default ESPTOOLPY_BAUD_115200B
+	default ESPTOOLPY_BAUD_921600B
 	help
 		Default baud rate to use while communicating with the ESP chip. Can be overridden by
 		setting the ESPBAUD variable.

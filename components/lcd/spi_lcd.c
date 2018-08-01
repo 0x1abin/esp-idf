@@ -14,6 +14,7 @@
 #include <sys/param.h>
 #include "spi_lcd.h"
 #include "driver/gpio.h"
+#include "driver/ledc.h"
 #include <string.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -201,11 +202,32 @@ uint32_t lcd_init(lcd_conf_t* lcd_conf, spi_device_handle_t *spi_wr_dev, lcd_dc_
     }
 
     //Enable backlight
-    if (lcd_conf->pin_num_bckl < GPIO_NUM_MAX) {
-        gpio_pad_select_gpio(lcd_conf->pin_num_bckl);
-        gpio_set_direction(lcd_conf->pin_num_bckl, GPIO_MODE_OUTPUT);
-        gpio_set_level(lcd_conf->pin_num_bckl, (lcd_conf->bckl_active_level) & 0x1);
-    }
+    // if (lcd_conf->pin_num_bckl < GPIO_NUM_MAX) {
+    //     gpio_pad_select_gpio(lcd_conf->pin_num_bckl);
+    //     gpio_set_direction(lcd_conf->pin_num_bckl, GPIO_MODE_OUTPUT);
+    //     gpio_set_level(lcd_conf->pin_num_bckl, (lcd_conf->bckl_active_level) & 0x1);
+    // }
+
+    //.............LCD LED .............
+	ledc_timer_config_t ledc_timer = {
+			.bit_num = LEDC_TIMER_8_BIT, // resolution of PWM duty
+			.freq_hz = 10000,              // frequency of PWM signal
+			.speed_mode = LEDC_HIGH_SPEED_MODE,   // timer mode
+			.timer_num = LEDC_TIMER_3    // timer index
+	};
+	// Set configuration of timer0 for high speed channels
+	ledc_timer_config(&ledc_timer);
+	
+	ledc_channel_config_t ledc_channel = 
+	{
+			.channel    = LEDC_CHANNEL_7,
+			.duty       = 127,
+			.gpio_num   = 32,
+			.speed_mode = LEDC_HIGH_SPEED_MODE,
+			.timer_sel  = LEDC_TIMER_3
+	};
+	ledc_channel_config(&ledc_channel);
+
     return lcd_id;
 }
 

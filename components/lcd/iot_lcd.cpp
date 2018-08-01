@@ -45,6 +45,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "esp_partition.h"
 #include "esp_log.h"
 #include "driver/gpio.h"
+#include "driver/ledc.h"
 
 #include "freertos/semphr.h"
 #include "freertos/task.h"
@@ -730,4 +731,10 @@ void CEspLcd::drawChar(int16_t x, int16_t y, unsigned char c, uint16_t color, ui
             ESP_LOGE("LCD", "Custom fonts with transparent bg not supported yet\n");
         }
     } // End classic vs custom font
+}
+
+void CEspLcd::setBrightness(uint8_t duty)
+{
+	ledc_set_duty(LEDC_HIGH_SPEED_MODE, LEDC_CHANNEL_7, duty);
+	ledc_update_duty(LEDC_HIGH_SPEED_MODE, LEDC_CHANNEL_7);
 }

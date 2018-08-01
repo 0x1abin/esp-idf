@@ -70,6 +70,7 @@ void lcd_drawFastVLine(lcd_handle_t* lcd_obj, int16_t x, int16_t y, int16_t h, u
 void lcd_drawFastHLine(lcd_handle_t* lcd_obj, int16_t x, int16_t y, int16_t w, uint16_t color);
 void lcd_getTextBounds(lcd_handle_t* lcd_obj, char *str, int16_t x, int16_t y, int16_t *x1, int16_t *y1, uint16_t *w, uint16_t *h);
 void lcd_setTextWrap(lcd_handle_t* lcd_obj, bool w);
+void lcd_setBrightness(lcd_handle_t* lcd_obj, uint8_t duty);
 
 
 

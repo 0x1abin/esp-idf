@@ -278,6 +278,8 @@ public:
     int drawNumber(int long_num, uint16_t poX, uint16_t poY);
 
     int drawFloat(float floatNumber, uint8_t decimal, uint16_t poX, uint16_t poY);
+
+    void setBrightness(uint8_t duty);
 };
 
 #endif
