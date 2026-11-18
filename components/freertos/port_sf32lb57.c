@@ -1,15 +1,11 @@
 /* SPDX-License-Identifier: Apache-2.0 */
 
-#include <errno.h>
 #include <stdlib.h>
-#include <sys/reent.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
-#include "esp_heap_caps.h"
+#include "sf32lb57_board.h"
 
 extern void sf32lb57_start_scheduler_timebase(void);
-extern void sf32lb57_board_restart(void);
-extern char __sf32lb57_heap_start[], __HeapLimit[];
 
 void vPortSetupTimerInterrupt(void)
 {
@@ -33,48 +29,6 @@ void *pvPortMalloc(size_t size)
 void vPortFree(void *ptr)
 {
     free(ptr);
-}
-
-void *heap_caps_malloc(size_t size, uint32_t caps)
-{
-    const uint32_t supported = MALLOC_CAP_DEFAULT | MALLOC_CAP_INTERNAL | MALLOC_CAP_8BIT | MALLOC_CAP_32BIT;
-    return (caps & ~supported) == 0 ? malloc(size) : NULL;
-}
-
-void heap_caps_free(void *ptr)
-{
-    free(ptr);
-}
-
-void *_sbrk(ptrdiff_t increment)
-{
-    static uintptr_t next;
-    const uintptr_t start = (uintptr_t)__sf32lb57_heap_start;
-    const uintptr_t limit = (uintptr_t)__HeapLimit;
-    if (!next) {
-        next = start;
-    }
-
-    if ((increment >= 0 && (uintptr_t)increment > limit - next) ||
-            (increment < 0 && (uintptr_t)(-(increment + 1)) + 1 > next - start)) {
-        errno = ENOMEM;
-        return (void *)-1;
-    }
-    uintptr_t previous = next;
-    next += (uintptr_t)increment;
-    return (void *)previous;
-}
-
-void __malloc_lock(struct _reent *context)
-{
-    (void)context;
-    vTaskSuspendAll();
-}
-
-void __malloc_unlock(struct _reent *context)
-{
-    (void)context;
-    xTaskResumeAll();
 }
 
 void esp_vApplicationIdleHook(void)

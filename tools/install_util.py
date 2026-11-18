@@ -36,13 +36,14 @@ def action_extract_features(args: str) -> None:
 
 def action_extract_targets(args: str) -> None:
     """
-    Command line arguments starting with "esp" are chip targets. This function selects those and prints them.
+    Command line arguments starting with "esp" or "sf32" are chip targets.
+    This function selects those and prints them.
     """
     target_sep = ','
     targets = []
 
     if args:
-        target_args = (arg for arg in args.split() if arg.lower().startswith('esp'))
+        target_args = (arg for arg in args.split() if arg.lower().startswith(('esp', 'sf32')))
         # target_args can be comma-separated lists of chip targets
 
         targets = list(chain.from_iterable(commalist.split(target_sep) for commalist in target_args))

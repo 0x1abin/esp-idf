@@ -1,7 +1,0 @@
-# SPDX-License-Identifier: Apache-2.0
-menu "SF32LB57 reference board"
-    config SF32LB57_MAIN_TASK_STACK_SIZE
-        int "Main task stack size (bytes)"
-        range 2048 32768
-        default 4096
-endmenu

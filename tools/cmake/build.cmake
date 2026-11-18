@@ -323,7 +323,7 @@ function(__build_init idf_path)
     endforeach()
 
     if(IDF_TARGET STREQUAL "sf32lb57")
-        idf_build_set_property(__COMPONENT_REQUIRES_COMMON "sf32lb57;freertos;esp_common")
+        idf_build_set_property(__COMPONENT_REQUIRES_COMMON "sf32lb57;freertos;esp_common;esp_hw_support;esp_system;heap;soc")
     elseif("${target}" STREQUAL "linux")
         set(requires_common freertos esp_hw_support heap log soc hal esp_rom esp_common esp_system linux esp_stdio)
         idf_build_set_property(__COMPONENT_REQUIRES_COMMON "${requires_common}")

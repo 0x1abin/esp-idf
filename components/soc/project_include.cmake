@@ -1,3 +1,8 @@
+if(CONFIG_IDF_TARGET_SF32LB57)
+    # The Arm toolchain and SiFli BSP supply the ABI flags and startup files.
+    return()
+endif()
+
 if(CONFIG_IDF_TOOLCHAIN_GCC)
     # Common flags
     idf_toolchain_add_flags(LINK_OPTIONS "-nostartfiles")

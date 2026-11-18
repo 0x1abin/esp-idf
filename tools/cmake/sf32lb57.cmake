@@ -14,8 +14,11 @@ function(sf32lb57_setup_image elf)
         DEPENDS ${elf} "${bsp}/sftool_param.json" "${image_tool}"
         VERBATIM)
     add_custom_target(sf32lb57_image ALL DEPENDS "${binary}" "${manifest}")
-    add_custom_target(flash
-        COMMAND "${python}" "${image_tool}" flash "${manifest}"
-        DEPENDS sf32lb57_image
-        USES_TERMINAL VERBATIM)
+    add_custom_target(app DEPENDS sf32lb57_image)
+    foreach(action flash app-flash)
+        add_custom_target(${action}
+            COMMAND "${python}" "${image_tool}" ${action} "${manifest}"
+            DEPENDS sf32lb57_image
+            USES_TERMINAL VERBATIM)
+    endforeach()
 endfunction()

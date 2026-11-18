@@ -1,5 +1,11 @@
 idf_build_get_property(target IDF_TARGET)
 
+if(target STREQUAL "sf32lb57")
+    idf_component_register(SRCS "port/sf32lb57/heap_caps.c" INCLUDE_DIRS "include"
+                           PRIV_REQUIRES freertos)
+    return()
+endif()
+
 # On Linux, we only support a few features, hence this simple component registration
 if(${target} STREQUAL "linux")
     idf_component_register(SRCS "heap_caps_linux.c"

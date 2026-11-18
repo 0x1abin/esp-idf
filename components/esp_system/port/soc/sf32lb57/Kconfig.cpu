@@ -1,0 +1,7 @@
+# SPDX-License-Identifier: Apache-2.0
+config SF32LB57_MAIN_TASK_STACK_SIZE
+    int "Main task stack size (bytes)"
+    range 2048 32768
+    default 4096
+    help
+        The stack for app_main on the HCPU. The SiFli board support package configures the CPU clock.

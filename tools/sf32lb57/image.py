@@ -7,6 +7,7 @@ import os
 import shutil
 import struct
 import subprocess
+import tempfile
 from pathlib import Path
 
 FLASH_BASE = 0x14000000
@@ -60,16 +61,58 @@ def package(bsp: Path, binary: Path, manifest_file: Path) -> None:
     temporary.replace(manifest_file)
 
 
-def flash(manifest_file: Path) -> None:
+def app_flash(sftool: list[str], manifest_file: Path) -> None:
+    manifest = json.loads(manifest_file.read_text())
+    if manifest['chip'] != 'SF32LB57' or manifest['memory'].lower() != 'nor':
+        raise ValueError('The flash manifest is not for the SF32LB57 reference board NOR flash')
+
+    images = {}
+    for item in manifest['write_flash']['files']:
+        address = int(item['address'], 0)
+        if address not in FLASH_FILES or address in images:
+            raise ValueError(f'Unexpected flash address {address:#x} in {manifest_file}')
+        image = manifest_file.parent / item['path']
+        if not 0 < image.stat().st_size <= FLASH_FILES[address][1] - address:
+            raise ValueError(f'{image} does not fit the flash region at {address:#x}')
+        images[address] = image
+    if images.keys() != FLASH_FILES.keys():
+        raise ValueError('The flash manifest must specify the flash table, bootloader, and HCPU application')
+
+    expected = {address: images[address].read_bytes() for address in (FLASH_BASE, BOOTLOADER)}
+    command = [*sftool, '-c', 'SF32LB57', '-m', 'nor']
+    with tempfile.TemporaryDirectory(prefix='sf32lb57-app-flash-') as directory:
+        staging = Path(directory)
+        app = staging / 'app.bin'
+        shutil.copyfile(images[APP], app)
+        if not 0 < app.stat().st_size <= APP_END - APP:
+            raise ValueError('The HCPU application does not fit in its flash region')
+
+        readback = {address: staging / f'{address:#x}.bin' for address in expected}
+        read_args = [f'{path.name}@{address:#x}:{len(expected[address])}' for address, path in readback.items()]
+        subprocess.run([*command, 'read_flash', *read_args], cwd=staging, check=True)
+        for address, path in readback.items():
+            if path.read_bytes() != expected[address]:
+                raise ValueError(
+                    f'{FLASH_FILES[address][0]} does not match NOR at {address:#x}. '
+                    'Run idf.py -p PORT flash to install the reference boot layout.'
+                )
+
+        subprocess.run([*command, 'write_flash', '--verify', f'{app.name}@{APP:#x}'], cwd=staging, check=True)
+
+
+def flash(manifest_file: Path, action: str) -> None:
     port = os.environ.get('ESPPORT')
     if not port:
-        raise ValueError('Select the SF32LB57 UART with idf.py -p PORT flash.')
+        raise ValueError(f'Select the SF32LB57 UART with idf.py -p PORT {action}.')
     sftool = shutil.which('sftool')
     if not sftool:
         raise ValueError('Install the SiFli sftool CLI and add it to PATH.')
     baud = os.environ.get('ESPBAUD', '1000000')
-    subprocess.run([sftool, '-p', port, '-b', baud, 'config', manifest_file.name],
-                   cwd=manifest_file.parent, check=True)
+    command = [sftool, '-p', port, '-b', baud]
+    if action == 'app-flash':
+        app_flash(command, manifest_file)
+    else:
+        subprocess.run([*command, 'config', manifest_file.name], cwd=manifest_file.parent, check=True)
 
 
 def main() -> None:
@@ -79,14 +122,15 @@ def main() -> None:
     pack.add_argument('bsp', type=Path)
     pack.add_argument('binary', type=Path)
     pack.add_argument('manifest', type=Path)
-    commands.add_parser('flash').add_argument('manifest', type=Path)
+    for action in ('flash', 'app-flash'):
+        commands.add_parser(action).add_argument('manifest', type=Path)
     args = parser.parse_args()
     try:
         if args.command == 'package':
             package(args.bsp, args.binary, args.manifest)
         else:
-            flash(args.manifest)
-    except (OSError, subprocess.CalledProcessError, ValueError) as exc:
+            flash(args.manifest, args.command)
+    except (OSError, subprocess.CalledProcessError, ValueError, KeyError, TypeError) as exc:
         parser.exit(1, f'{exc}\n')
 
 

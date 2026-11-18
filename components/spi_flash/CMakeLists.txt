@@ -1,4 +1,10 @@
 idf_build_get_property(target IDF_TARGET)
+
+if(target STREQUAL "sf32lb57")
+    idf_component_register(SRCS "port/sf32lb57/esp_flash.c" INCLUDE_DIRS "include"
+                           REQUIRES esp_hal_mspi esp_blockdev PRIV_REQUIRES sf32lb57)
+    return()
+endif()
 idf_build_get_property(non_os_build NON_OS_BUILD)
 
 if(${target} STREQUAL "linux")

@@ -2,6 +2,7 @@
 
 #include "rtconfig.h"
 #include "bf0_hal.h"
+#include "drv_io.h"
 #include "sf32lb57_board.h"
 
 static UART_HandleTypeDef console;
@@ -27,6 +28,22 @@ void sf32lb57_board_init(void)
 uint32_t sf32lb57_cpu_hz(void)
 {
     return HAL_RCC_GetHCLKFreq(CORE_ID_HCPU);
+}
+
+uint16_t sf32lb57_chip_revision(void)
+{
+    return __HAL_SYSCFG_GET_REVID();
+}
+
+uint32_t sf32lb57_nor_size(void)
+{
+    const FLASH_HandleTypeDef *flash = BSP_Flash_get_handle(MPI3_MEM_BASE);
+    return flash && !flash->isNand ? flash->size : 0;
+}
+
+int sf32lb57_nor_read(void *buffer, uint32_t offset, uint32_t size)
+{
+    return BSP_Nor_read(MPI3_MEM_BASE + offset, buffer, (int)size) == (int)size;
 }
 
 void sf32lb57_board_tick(void)

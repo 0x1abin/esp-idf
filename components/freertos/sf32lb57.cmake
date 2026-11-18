@@ -21,7 +21,6 @@ endif()
 
 target_sources(${COMPONENT_LIB} PRIVATE "${arm_port}/port.c" "${arm_port}/portasm.c" "port_sf32lb57.c")
 target_include_directories(${COMPONENT_LIB} PUBLIC "${arm_port}")
-target_include_directories(${COMPONENT_LIB} PUBLIC "$ENV{IDF_PATH}/components/heap/include")
 set_source_files_properties("${arm_port}/port.c" PROPERTIES
     COMPILE_DEFINITIONS "SysTick_Handler=sf32lb57_freertos_systick")
 target_link_libraries(${COMPONENT_LIB} INTERFACE "-u app_main")

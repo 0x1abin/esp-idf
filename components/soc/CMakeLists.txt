@@ -1,5 +1,10 @@
 idf_build_get_property(target IDF_TARGET)
 
+if(target STREQUAL "sf32lb57")
+    idf_component_register(INCLUDE_DIRS "include" "sf32lb57/include")
+    return()
+endif()
+
 set(target_folder "${target}")
 
 set(srcs)

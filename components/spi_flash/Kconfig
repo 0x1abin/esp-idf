@@ -1,5 +1,5 @@
 menu "Main Flash configuration"
-    depends on !APP_BUILD_TYPE_PURE_RAM_APP
+    depends on !APP_BUILD_TYPE_PURE_RAM_APP && !IDF_TARGET_SF32LB57
 
     menu "SPI Flash behavior when brownout"
 
@@ -191,6 +191,7 @@ menu "Main Flash configuration"
 endmenu
 
 menu "SPI Flash driver"
+    depends on !IDF_TARGET_SF32LB57
     depends on !APP_BUILD_TYPE_PURE_RAM_APP
 
     config SPI_FLASH_VERIFY_WRITE

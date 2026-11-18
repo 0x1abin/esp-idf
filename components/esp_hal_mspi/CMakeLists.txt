@@ -1,6 +1,11 @@
 idf_build_get_property(target IDF_TARGET)
 idf_build_get_property(esp_tee_build ESP_TEE_BUILD)
 
+if(target STREQUAL "sf32lb57")
+    idf_component_register(INCLUDE_DIRS "include")
+    return()
+endif()
+
 if(${target} STREQUAL "linux")
     idf_component_register(INCLUDE_DIRS "include"
                            REQUIRES soc hal)

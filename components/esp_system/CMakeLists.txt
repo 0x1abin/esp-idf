@@ -1,6 +1,12 @@
 idf_build_get_property(target IDF_TARGET)
 idf_build_get_property(esp_tee_build ESP_TEE_BUILD)
 
+if(target STREQUAL "sf32lb57")
+    idf_component_register(SRCS "esp_system.c" "port/soc/sf32lb57/system_internal.c"
+                           INCLUDE_DIRS "include" PRIV_REQUIRES sf32lb57 heap)
+    return()
+endif()
+
 # On Linux, we only support a few features, hence this simple component registration
 if(${target} STREQUAL "linux")
     idf_component_register(SRCS "esp_system.c"

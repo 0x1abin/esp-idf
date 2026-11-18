@@ -1,6 +1,12 @@
 idf_build_get_property(target IDF_TARGET)
 idf_build_get_property(non_os_build NON_OS_BUILD)
 
+if(target STREQUAL "sf32lb57")
+    idf_component_register(SRCS "port/sf32lb57/chip_info.c" INCLUDE_DIRS "include"
+                           PRIV_REQUIRES sf32lb57 soc)
+    return()
+endif()
+
 # On Linux, we only support a few features, hence this simple component registration
 if(${target} STREQUAL "linux")
     # "include/linux" MUST come before "include" so that Linux-specific header

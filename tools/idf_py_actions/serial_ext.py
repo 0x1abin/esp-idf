@@ -172,7 +172,7 @@ def action_extensions(base_actions: dict, project_path: str) -> dict:
                 raise FatalError('SF32LB57 uses the raw UART monitor. ESP-specific monitor options are unavailable.')
             baud = monitor_baud or os.getenv('IDF_MONITOR_BAUD') or os.getenv('MONITORBAUD')
             if not baud:
-                baud = args.baud if ctx._parameter_source['baud'] == ParameterSource.COMMANDLINE else '1000000'
+                baud = args.baud if ctx._parameter_source['baud'] != ParameterSource.DEFAULT else '1000000'
             RunTool(
                 'SF32LB57 UART monitor',
                 [PYTHON, '-m', 'serial.tools.miniterm', '--raw', '--dtr', '0', '--rts', '0', args.port, str(baud)],
@@ -302,12 +302,14 @@ def action_extensions(base_actions: dict, project_path: str) -> dict:
             return
 
         if project_desc['target'] == 'sf32lb57':
-            if action != 'flash' or trust_flash_content or force or extra_args or trace:
-                raise FatalError('SF32LB57 supports full-board flash through sftool.')
+            if action not in ('flash', 'app-flash'):
+                raise FatalError('SF32LB57 supports flash and app-flash through sftool.')
+            if trust_flash_content or force or extra_args or trace:
+                raise FatalError('SF32LB57 flash and app-flash require verification and use sftool defaults.')
             if args.port is None:
-                raise FatalError('Select the SF32LB57 UART with idf.py -p PORT flash.')
-            baud = args.baud if ctx._parameter_source['baud'] == ParameterSource.COMMANDLINE else 1000000
-            run_target('flash', args, {'ESPPORT': args.port, 'ESPBAUD': str(baud)}, interactive=True)
+                raise FatalError(f'Select the SF32LB57 UART with idf.py -p PORT {action}.')
+            baud = args.baud if ctx._parameter_source['baud'] != ParameterSource.DEFAULT else 1000000
+            run_target(action, args, {'ESPPORT': args.port, 'ESPBAUD': str(baud)}, interactive=True)
             return
 
         args.port = args.port or get_default_serial_port()

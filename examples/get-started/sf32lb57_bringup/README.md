@@ -14,21 +14,24 @@ Wi-Fi pin routing and disconnect a camera or other peripheral sharing SDMMC2.
 
 ## Build on Linux
 
-Use SiFli SDK v2.5.2 with its submodules, SiFli Arm GNU 14.2.1, CMake, Ninja,
-SCons, and SiFli sftool 0.2.5. Set `IDF_PATH` to this fork and `SIFLI_SDK` to
-the SiFli checkout. Start with both SDKs' core Python requirements in an
-activated virtual environment, and put the Arm compiler and sftool on PATH.
+Install CMake 3.22 or later and Ninja. From the ESP-IDF fork, use the standard
+installer and export script to install and activate SiFli Arm GNU 14.2.1 and
+sftool 0.2.5. Set `SIFLI_SDK` to a SiFli SDK v2.5.2 checkout with submodules.
 
 ```bash
-python -m pip install -r "$IDF_PATH/tools/requirements/requirements.core.txt" \
-  -r "$SIFLI_SDK/tools/requirements/requirements.core.txt" cmake ninja
-export IDF_PYTHON_ENV_PATH="$VIRTUAL_ENV"
-export IDF_PYTHON_CHECK_CONSTRAINTS=no
-export ESP_IDF_VERSION=6.1.1
-cd "$IDF_PATH/examples/get-started/sf32lb57_bringup"
-python "$IDF_PATH/tools/idf.py" set-target sf32lb57
-python "$IDF_PATH/tools/idf.py" build
+git clone --branch v2.5.2 --recurse-submodules https://github.com/OpenSiFli/SiFli-SDK ../SiFli-SDK
+export SIFLI_SDK="$(realpath ../SiFli-SDK)"
+./install.sh sf32lb57
+. ./export.sh
+python -m pip install -r "$SIFLI_SDK/tools/requirements/requirements.core.txt"
+idf.py -C examples/get-started/sf32lb57_bringup set-target sf32lb57
+idf.py -C examples/get-started/sf32lb57_bringup build
 ```
+
+The upstream `examples/get-started/hello_world` also builds unchanged for
+`sf32lb57`. It uses the HCPU chip information, external MPI3 NOR capacity,
+newlib heap statistics, FreeRTOS delays, and board reset through the ESP-IDF
+public APIs. The in-application NOR API currently supports capacity and reads.
 
 The build downloads a checksum-pinned FreeRTOS V10.5.1 source archive for its
 Arm port. For an offline build set `SF32LB57_FREERTOS_PATH` to a checkout of
@@ -37,7 +40,7 @@ FreeRTOS-Kernel at `V10.5.1` before configuring.
 ## Flash and observe
 
 ```bash
-python "$IDF_PATH/tools/idf.py" -p /dev/ttyUSB0 flash monitor
+idf.py -C examples/get-started/sf32lb57_bringup -p /dev/ttyUSB0 flash monitor
 ```
 
 Replace the example port with the board's UART. Flash writes the SiFli
@@ -48,6 +51,18 @@ exits on Ctrl+]. After reset, look for `SF32LB57 HCPU: app_main running`,
 the SDIO IDs, and one timer line per second. A probe stage of 1 identifies
 AW9523 setup, 2 SDIO commands, 3 card power readiness, 4 card selection,
 5 the manufacturer tuple, and 6 power-off.
+
+After installing the reference boot layout with `flash`, use `app-flash` to
+update the HCPU application. It reads and compares the installed bootloader
+and flash table with the build output before writing the application with
+readback verification. Use `flash` if the board has a different boot layout.
+
+```bash
+idf.py -C examples/get-started/sf32lb57_bringup -p /dev/ttyUSB0 app-flash monitor
+```
+
+`app-flash` writes the whole HCPU application image. Flashing only changed
+sectors requires further work and validation on the reference board.
 
 ## Original RT-Thread Wi-Fi reference
 
