@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: Apache-2.0
+import os
+from building import DefineGroup
+
+Import('SIFLI_SDK')
+objects = SConscript(os.path.join(SIFLI_SDK, 'SConscript'), variant_dir='sifli_sdk', duplicate=0)
+objects += DefineGroup('idf_board', ['board.c', 'sdio_probe.c'], depend=[])
+Return('objects')

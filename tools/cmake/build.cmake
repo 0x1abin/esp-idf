@@ -197,7 +197,10 @@ function(__build_set_default_build_specifications)
                                     # always generate debug symbols (even in release mode, these don't
                                     # go into the final binary so have no impact on size
                                     "-ggdb")
-    if(NOT IDF_TARGET STREQUAL "linux")
+    if(IDF_TARGET STREQUAL "sf32lb57")
+        list(APPEND c_compile_options "-std=gnu17")
+        list(APPEND cxx_compile_options "-std=gnu++23")
+    elseif(NOT IDF_TARGET STREQUAL "linux")
         # Building for chip targets: we use a known version of the toolchain.
         # Use latest supported versions.
         # For Linux target -std settings, refer to the __linux_build_set_lang_version
@@ -319,7 +322,9 @@ function(__build_init idf_path)
         endif()
     endforeach()
 
-    if("${target}" STREQUAL "linux")
+    if(IDF_TARGET STREQUAL "sf32lb57")
+        idf_build_set_property(__COMPONENT_REQUIRES_COMMON "sf32lb57;freertos;esp_common")
+    elseif("${target}" STREQUAL "linux")
         set(requires_common freertos esp_hw_support heap log soc hal esp_rom esp_common esp_system linux esp_stdio)
         idf_build_set_property(__COMPONENT_REQUIRES_COMMON "${requires_common}")
     else()
@@ -618,6 +623,8 @@ macro(idf_build_process target)
 
     if("${target}" STREQUAL "esp32" OR "${target}" STREQUAL "esp32s2" OR "${target}" STREQUAL "esp32s3")
         idf_build_set_property(IDF_TARGET_ARCH "xtensa")
+    elseif("${target}" STREQUAL "sf32lb57")
+        idf_build_set_property(IDF_TARGET_ARCH "arm")
     elseif("${target}" STREQUAL "linux")
         # No arch specified for linux host builds at the moment
         idf_build_set_property(IDF_TARGET_ARCH "")
@@ -641,7 +648,7 @@ macro(idf_build_process target)
     idf_build_get_property(target IDF_TARGET)
     idf_build_get_property(arch IDF_TARGET_ARCH)
 
-    if(NOT "${target}" STREQUAL "linux")
+    if(NOT target MATCHES "^(linux|sf32lb57)$")
         idf_build_set_property(__COMPONENT_REQUIRES_COMMON ${arch} APPEND)
     endif()
 
@@ -827,7 +834,7 @@ macro(idf_build_process target)
         # Create flash targets early so components can attach images to them.
         # These targets will be appended with actual esptool command later
         # in the build process when __idf_build_setup_flash_targets() is called.
-        if(NOT BOOTLOADER_BUILD AND NOT ESP_TEE_BUILD AND NOT "${target}" STREQUAL "linux")
+        if(NOT BOOTLOADER_BUILD AND NOT ESP_TEE_BUILD AND NOT target MATCHES "^(linux|sf32lb57)$")
             __build_create_flash_targets()
         endif()
 
@@ -899,6 +906,13 @@ function(idf_build_executable elf)
 
     idf_build_get_property(bootloader_build BOOTLOADER_BUILD)
     idf_build_get_property(esp_tee_build ESP_TEE_BUILD)
+
+    idf_build_get_property(target IDF_TARGET)
+    if(target STREQUAL "sf32lb57")
+        include(sf32lb57)
+        sf32lb57_setup_image(${elf})
+        return()
+    endif()
 
     if(NOT bootloader_build AND NOT esp_tee_build)
         # All of the following logic for generating binaries and flash targets

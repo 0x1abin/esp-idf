@@ -40,6 +40,8 @@ if(CONFIG_IDF_TARGET_ARCH_XTENSA)
     set(arch "xtensa")
 elseif(CONFIG_IDF_TARGET_ARCH_RISCV)
     set(arch "riscv")
+elseif(target STREQUAL "sf32lb57")
+    set(arch "arm")
 elseif(${target} STREQUAL "linux")
     set(arch "linux")
 endif()
@@ -52,13 +54,16 @@ set(ldfragments "")
 
 # ---------------------------------------------------- Set Private Requirements ----------------------------------------
 
-list(APPEND private_requirements esp_hal_systimer)
+if(NOT target STREQUAL "sf32lb57")
+    list(APPEND private_requirements esp_hal_systimer)
+endif()
 
 # ---------------------------------------------------- Set Sources -----------------------------------------------------
 
 # Add common source files
-list(APPEND srcs
-    "heap_idf.c")
+if(NOT target STREQUAL "sf32lb57")
+    list(APPEND srcs "heap_idf.c")
+endif()
 
 if((arch STREQUAL "xtensa") OR (arch STREQUAL "riscv"))
     list(APPEND srcs
@@ -77,9 +82,9 @@ list(APPEND srcs
     "${kernel_impl}/stream_buffer.c")
 
 # Add port source files
-list(APPEND srcs
-    "${kernel_impl}/portable/${arch}/port.c")
-
+if(NOT arch STREQUAL "arm")
+    list(APPEND srcs "${kernel_impl}/portable/${arch}/port.c")
+endif()
 if(arch STREQUAL "linux")
     list(APPEND srcs
         "${kernel_impl}/portable/${arch}/utils/wait_for_event.c")
@@ -87,7 +92,7 @@ if(arch STREQUAL "linux")
         list(APPEND srcs
             "${kernel_impl}/portable/${arch}/port_idf.c")
     endif()
-else()
+elseif(NOT arch STREQUAL "arm")
     list(APPEND srcs
         "${kernel_impl}/portable/${arch}/portasm.S")
 endif()
@@ -99,9 +104,9 @@ if(arch STREQUAL "xtensa")
 endif()
 
 # Add ESP-additions source files
-list(APPEND srcs
-    "esp_additions/idf_additions_event_groups.c"
-    "esp_additions/idf_additions.c")
+if(NOT arch STREQUAL "arm")
+    list(APPEND srcs "esp_additions/idf_additions_event_groups.c" "esp_additions/idf_additions.c")
+endif()
 
 if(arch STREQUAL "linux")
     # Check if we need to address the FreeRTOS EINTR coexistence with linux system calls if we're building without
@@ -162,8 +167,9 @@ list(APPEND private_include_dirs
 # ------------------------------------------------------- Misc ---------------------------------------------------------
 
 # Add linker fragments
-list(APPEND ldfragments
-    "linker_common.lf")
+if(NOT arch STREQUAL "arm")
+    list(APPEND ldfragments "linker_common.lf")
+endif()
 
 if((arch STREQUAL "xtensa") OR (arch STREQUAL "riscv"))
     if(kernel_impl STREQUAL "FreeRTOS-Kernel-SMP")
@@ -183,7 +189,10 @@ idf_component_register(SRCS ${srcs}
                     LDFRAGMENTS ${ldfragments}
                     PRIV_REQUIRES ${private_requirements})
 
-if(arch STREQUAL "linux")
+if(arch STREQUAL "arm")
+    include(sf32lb57.cmake)
+    return()
+elseif(arch STREQUAL "linux")
     target_compile_definitions(${COMPONENT_LIB} PUBLIC "projCOVERAGE_TEST=0")
     target_link_libraries(${COMPONENT_LIB} PUBLIC pthread)
     if(BYPASS_EINTR_ISSUE)

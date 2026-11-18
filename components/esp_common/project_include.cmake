@@ -3,7 +3,7 @@
 #
 idf_build_get_property(target IDF_TARGET)
 
-if(NOT (${target} STREQUAL "linux" OR CMAKE_C_COMPILER_ID MATCHES "Clang"))
+if(NOT (target MATCHES "^(linux|sf32lb57)$" OR CMAKE_C_COMPILER_ID MATCHES "Clang"))
     __compiler_query(toolchain_name ${CMAKE_C_COMPILER} -dumpmachine)
     check_expected_tool_version(${toolchain_name} ${CMAKE_C_COMPILER})
 endif()

@@ -19,6 +19,9 @@ cmake_minimum_required(VERSION 3.22)
 #   project(my_app C CXX ASM)
 #   idf_project_default()
 if($ENV{IDF_BUILD_V2})
+    if(IDF_TARGET STREQUAL "sf32lb57" OR "$ENV{IDF_TARGET}" STREQUAL "sf32lb57")
+        message(FATAL_ERROR "SF32LB57 currently requires ESP-IDF build system v1.")
+    endif()
     message(STATUS "IDF Build System V2 (cmakev2) activated via IDF_BUILD_V2 shim")
 
     # Include the Build system v2 (cmakev2) entry point. This sets up all
@@ -615,6 +618,10 @@ function(__project_init components_var test_components_var)
     # variable is not already defined. The COMPONENTS variable takes precedence over
     # the MINIMAL_BUILD property.
     idf_build_get_property(minimal_build MINIMAL_BUILD)
+    if(IDF_TARGET STREQUAL "sf32lb57" AND NOT DEFINED COMPONENTS)
+        set(minimal_build ON)
+        idf_build_set_property(MINIMAL_BUILD ON)
+    endif()
     if(minimal_build)
         if(DEFINED COMPONENTS)
             message(WARNING "The MINIMAL_BUILD property is disregarded because the COMPONENTS variable is defined.")

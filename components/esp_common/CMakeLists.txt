@@ -1,6 +1,6 @@
 idf_build_get_property(target IDF_TARGET)
 
-if(${target} STREQUAL "linux")
+if(target MATCHES "^(linux|sf32lb57)$")
     set(ldfragments)
 else()
     set(ldfragments common.lf soc.lf)

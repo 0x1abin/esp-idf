@@ -1,0 +1,79 @@
+name: SF32LB57 fork build checks
+
+on:
+  push:
+    branches: [feature/sf32lb57]
+  pull_request:
+    paths:
+      - '.github/workflows/sf32lb57-build.yml'
+      - 'Kconfig'
+      - 'components/**'
+      - 'examples/get-started/sf32lb57_bringup/**'
+      - 'tools/**'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        target: [sf32lb57, esp32c3, esp32s3]
+    env:
+      IDF_PYTHON_CHECK_CONSTRAINTS: 'no'
+      ESP_IDF_VERSION: '6.1.1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install ESP-IDF build tools
+        run: |
+          python -m venv "$RUNNER_TEMP/idf-python"
+          echo "$RUNNER_TEMP/idf-python/bin" >> "$GITHUB_PATH"
+          echo "IDF_PYTHON_ENV_PATH=$RUNNER_TEMP/idf-python" >> "$GITHUB_ENV"
+          echo "IDF_PATH=$GITHUB_WORKSPACE" >> "$GITHUB_ENV"
+          "$RUNNER_TEMP/idf-python/bin/pip" install -r tools/requirements/requirements.core.txt cmake ninja
+      - name: Install SiFli SDK and Arm compiler
+        if: matrix.target == 'sf32lb57'
+        run: |
+          git clone --depth 1 --branch v2.5.2 --recurse-submodules --shallow-submodules https://github.com/OpenSiFli/SiFli-SDK "$RUNNER_TEMP/SiFli-SDK"
+          echo "SIFLI_SDK=$RUNNER_TEMP/SiFli-SDK" >> "$GITHUB_ENV"
+          pip install -r "$RUNNER_TEMP/SiFli-SDK/tools/requirements/requirements.core.txt"
+          compiler=arm-none-eabi-14.2.0-x86_64-linux-gnu.tar.xz
+          download=https://github.com/OpenSiFli/crosstool-ng/releases/download/14.2.0-20250221
+          mkdir "$RUNNER_TEMP/arm"
+          curl --fail --location --silent --show-error "$download/$compiler" -o "$RUNNER_TEMP/$compiler"
+          echo "b93f17586b0048c15211c7ace48916f6b83d20fdfa985a790186b13c81f9c9a5  $RUNNER_TEMP/$compiler" | sha256sum -c -
+          tar -xf "$RUNNER_TEMP/$compiler" -C "$RUNNER_TEMP/arm"
+          echo "$RUNNER_TEMP/arm/bin" >> "$GITHUB_PATH"
+      - name: Install Espressif compiler
+        if: matrix.target != 'sf32lb57'
+        run: |
+          if [[ "$TARGET" == esp32c3 ]]; then
+            tool=riscv32-esp-elf
+          else
+            tool=xtensa-esp-elf
+          fi
+          python tools/idf_tools.py install "$tool" esp-rom-elfs
+          tools_dir="${IDF_TOOLS_PATH:-$HOME/.espressif}/tools"
+          find "$tools_dir/$tool" -type d -name bin >> "$GITHUB_PATH"
+          rom_dir=$(find "$tools_dir/esp-rom-elfs" -mindepth 1 -maxdepth 1 -type d -print -quit)
+          echo "ESP_ROM_ELF_DIR=$rom_dir" >> "$GITHUB_ENV"
+        env:
+          TARGET: ${{ matrix.target }}
+      - name: Build reference firmware
+        run: |
+          if [[ "$TARGET" == sf32lb57 ]]; then
+            example=sf32lb57_bringup
+          else
+            example=hello_world
+          fi
+          cd "examples/get-started/$example"
+          python "$IDF_PATH/tools/idf.py" set-target "$TARGET"
+          python "$IDF_PATH/tools/idf.py" build
+        env:
+          TARGET: ${{ matrix.target }}

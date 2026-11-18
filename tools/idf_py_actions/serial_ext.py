@@ -164,6 +164,23 @@ def action_extensions(base_actions: dict, project_path: str) -> dict:
 
         detected_target = None
 
+        target = _get_project_desc(ctx, args)['target'] if project_built else target_selected
+        if target == 'sf32lb57':
+            if args.port is None:
+                raise FatalError('Select the SF32LB57 UART with idf.py -p PORT monitor.')
+            if encrypted or print_filter or timestamps or timestamp_format or force_color or disable_auto_color:
+                raise FatalError('SF32LB57 uses the raw UART monitor. ESP-specific monitor options are unavailable.')
+            baud = monitor_baud or os.getenv('IDF_MONITOR_BAUD') or os.getenv('MONITORBAUD')
+            if not baud:
+                baud = args.baud if ctx._parameter_source['baud'] == ParameterSource.COMMANDLINE else '1000000'
+            RunTool(
+                'SF32LB57 UART monitor',
+                [PYTHON, '-m', 'serial.tools.miniterm', '--raw', '--dtr', '0', '--rts', '0', args.port, str(baud)],
+                args.project_dir,
+                interactive=True,
+            )()
+            return
+
         if not project_built:
             if no_reset and args.port is None:
                 raise FatalError(
@@ -282,6 +299,15 @@ def action_extensions(base_actions: dict, project_path: str) -> dict:
         project_desc = _get_project_desc(ctx, args)
         if project_desc['target'] == 'linux':
             yellow_print('skipping flash since running on linux...')
+            return
+
+        if project_desc['target'] == 'sf32lb57':
+            if action != 'flash' or trust_flash_content or force or extra_args or trace:
+                raise FatalError('SF32LB57 supports full-board flash through sftool.')
+            if args.port is None:
+                raise FatalError('Select the SF32LB57 UART with idf.py -p PORT flash.')
+            baud = args.baud if ctx._parameter_source['baud'] == ParameterSource.COMMANDLINE else 1000000
+            run_target('flash', args, {'ESPPORT': args.port, 'ESPBAUD': str(baud)}, interactive=True)
             return
 
         args.port = args.port or get_default_serial_port()

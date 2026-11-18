@@ -1,0 +1,21 @@
+# SPDX-License-Identifier: Apache-2.0
+import os
+
+import rtconfig
+from building import AddBootLoader, AddFTAB, DoBuilding, GenDownloadScript
+from building import GetCurrentEnv, PrepareBuilding, PrepareEnv, SifliEnv
+from SCons.Script import File, Flatten
+
+sdk = os.environ['SIFLI_SDK']
+PrepareEnv()
+AddBootLoader(sdk, rtconfig.CHIP)
+SifliEnv()
+bsp_objects = PrepareBuilding(None)
+env = GetCurrentEnv()
+
+env.Library(os.path.join(rtconfig.OUTPUT_DIR, 'sf32lb57_bsp'), Flatten(bsp_objects))
+probe = env.Object(os.path.join(rtconfig.OUTPUT_DIR, 'probe.o'), File('probe.c'))
+image = os.path.join(rtconfig.OUTPUT_DIR, rtconfig.TARGET_NAME + '.' + rtconfig.TARGET_EXT)
+DoBuilding(image, Flatten(bsp_objects) + list(probe))
+AddFTAB(sdk, rtconfig.CHIP, env)
+GenDownloadScript(env)

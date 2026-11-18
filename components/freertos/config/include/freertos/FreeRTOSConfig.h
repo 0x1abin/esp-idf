@@ -88,13 +88,17 @@
 #if configUSE_TICKLESS_IDLE
     #define configEXPECTED_IDLE_TIME_BEFORE_SLEEP    CONFIG_FREERTOS_IDLE_TIME_BEFORE_SLEEP
 #endif /* configUSE_TICKLESS_IDLE */
-#define configCPU_CLOCK_HZ                           ( CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ * 1000000 )
+#ifndef configCPU_CLOCK_HZ
+    #define configCPU_CLOCK_HZ                       ( CONFIG_ESP_DEFAULT_CPU_FREQ_MHZ * 1000000 )
+#endif
 #define configTICK_RATE_HZ                           CONFIG_FREERTOS_HZ
 #define configMAX_PRIORITIES                         ( 25 )
 #define configUSE_TIME_SLICING                       1
 #define configUSE_16_BIT_TICKS                       0
 #define configIDLE_SHOULD_YIELD                      0
-#define configKERNEL_INTERRUPT_PRIORITY              1      /*Todo: This currently isn't used anywhere */
+#ifndef configKERNEL_INTERRUPT_PRIORITY
+    #define configKERNEL_INTERRUPT_PRIORITY          1      /*Todo: This currently isn't used anywhere */
+#endif
 #define configNUMBER_OF_CORES                        CONFIG_FREERTOS_NUMBER_OF_CORES
 /* For compatibility */
 #define configNUM_CORES                              configNUMBER_OF_CORES

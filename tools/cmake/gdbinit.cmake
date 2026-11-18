@@ -45,7 +45,7 @@ function(__generate_gdbinit)
     file(MAKE_DIRECTORY ${gdbinit_dir})
 
     # Get ROM ELFs gdbinit part
-    if(CONFIG_IDF_TARGET_LINUX)
+    if(CONFIG_IDF_TARGET_LINUX OR CONFIG_IDF_TARGET_SF32LB57)
         set(rom_symbols)
     else()
         execute_process(
